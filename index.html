@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Paircrypt</title>
+	<meta charset="UTF-8">
+	<meta name="robots" content="noindex">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tweetnacl/1.0.3/nacl-fast.min.js"></script>
+	<style>
+		.accordion-button:focus{
+			box-shadow:none;
+		}
+		.accordion-button::after{
+			background-image:none;
+		}
+		.accordion-button:not(.collapsed)::after{
+			background-image:none;
+		}
+		body{
+			margin:0;
+			width:100vw;
+			height:100vh;
+			overflow:hidden;
+			display:flex;
+			align-items:center;
+			justify-content:center;
+		}
+		textarea{
+			resize:none;
+		}
+		#everything{
+			width:min(840px,90%);
+		}
+		#exchange-toggle,#encrypt-note{
+			display:none;
+		}
+		@media screen and (max-width:600px){
+			body{
+				display:block;
+				overflow-x:hidden;
+				overflow-y:scroll;
+			}
+			#everything{
+				padding:32px;
+				box-sizing:border-box;
+				width:100%;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div id="everything" class="accordion">
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="heading-1">
+				<button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapse-1" disabled>
+					Getting Started
+				</button>
+			</h2>
+			<div id="collapse-1" class="accordion-collapse collapse show" data-bs-parent="#everything">
+				<div class="accordion-body">
+					Welcome to Paircrypt! Have you used this tool before?
+					<div class="mt-3">
+						<button id="used-no" class="btn btn-outline-primary">No</button>
+						<button id="used-yes" class="btn btn-outline-primary">Yes</button>
+					</div>
+					<script>
+						const toHex = bytes=>{
+							return Array.from(bytes,byte=>{
+								return ("0"+byte.toString(16).toUpperCase()).slice(-2);
+							}).join("");
+						};
+						document.getElementById("used-no").onclick = ()=>{
+							document.querySelector("#heading-2 > button").disabled = false;
+							document.querySelector("#heading-2 > button").click();
+							document.querySelector("#heading-2 > button").disabled = true;
+							var keyPair = nacl.box.keyPair();
+							var publicKey = toHex(keyPair.publicKey);
+							var secretKey = toHex(keyPair.secretKey);
+							document.getElementById("new-publickey").value = publicKey;
+							document.getElementById("new-secretkey").value = secretKey;
+						};
+						document.getElementById("used-yes").onclick = ()=>{
+							document.querySelector("#heading-3 > button").disabled = false;
+							document.querySelector("#heading-3 > button").click();
+							document.querySelector("#heading-3 > button").disabled = true;
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="heading-2">
+				<button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-2" disabled>
+					Generate a Key Pair
+				</button>
+			</h2>
+			<div id="collapse-2" class="accordion-collapse collapse" data-bs-parent="#everything">
+				<div class="accordion-body">
+					Here are your keys. <strong>Store them somewhere safe and accessible!</strong>
+					<div class="input-group mb-3 mt-3">
+						<span class="input-group-text">Public Key</span>
+						<input id="new-publickey" type="text" class="form-control" readonly>
+						<button id="gen-copy-publickey" class="btn btn-outline-secondary">
+							<i class="fa-regular fa-clipboard fa-fw"></i>
+						</button>
+					</div>
+					<div class="input-group mb-3">
+						<span class="input-group-text">Secret Key</span>
+						<input id="new-secretkey" type="text" class="form-control" readonly>
+						<button id="gen-copy-secretkey" class="btn btn-outline-secondary">
+							<i class="fa-regular fa-clipboard fa-fw"></i>
+						</button>
+					</div>
+					Your <strong>Public Key</strong> is like an address &ndash; <strong>you can share it with anyone.</strong>
+					<br>
+					Your <strong>Secret Key</strong> is like a password &ndash; <strong>you must keep it a secret.</strong>
+					<br>
+					<button id="gen-understood" class="btn btn-outline-primary mt-3">Understood</button>
+					<script>
+						document.getElementById("gen-copy-publickey").onclick = ()=>{
+							navigator.clipboard.writeText(document.getElementById("new-publickey").value);
+							document.getElementById("gen-copy-publickey").disabled = true;
+							document.querySelector("#gen-copy-publickey i").className = "fa-solid fa-check fa-fw";
+							setTimeout(()=>{
+								document.getElementById("gen-copy-publickey").disabled = false;
+								document.querySelector("#gen-copy-publickey i").className = "fa-regular fa-clipboard fa-fw";
+							},1000);
+						};
+						document.getElementById("gen-copy-secretkey").onclick = ()=>{
+							navigator.clipboard.writeText(document.getElementById("new-secretkey").value);
+							document.getElementById("gen-copy-secretkey").disabled = true;
+							document.querySelector("#gen-copy-secretkey i").className = "fa-solid fa-check fa-fw";
+							setTimeout(()=>{
+								document.getElementById("gen-copy-secretkey").disabled = false;
+								document.querySelector("#gen-copy-secretkey i").className = "fa-regular fa-clipboard fa-fw";
+							},1000);
+						};
+						document.getElementById("gen-understood").onclick = ()=>{
+							document.querySelector("#heading-3 > button").disabled = false;
+							document.querySelector("#heading-3 > button").click();
+							document.querySelector("#heading-3 > button").disabled = true;
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="heading-3">
+				<button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-3" disabled>
+					Enter Your Secret Key
+				</button>
+			</h2>
+			<div id="collapse-3" class="accordion-collapse collapse" data-bs-parent="#everything">
+				<div class="accordion-body">
+					It should be 64 hexadecimal characters long.
+					<div class="input-group mb-3 mt-3">
+						<span class="input-group-text">Secret Key</span>
+						<input id="your-secretkey" type="text" class="form-control">
+					</div>
+					<button id="your-next" class="btn btn-outline-primary">Next</button>
+					<script>
+						document.getElementById("your-secretkey").oninput = function(){
+							this.classList.remove("is-invalid");
+						}
+						document.getElementById("your-next").onclick = ()=>{
+							window.your = document.getElementById("your-secretkey").value;
+							if(!window.your.match(/^[0-9A-Fa-f]{64}$/)){
+								document.getElementById("your-secretkey").classList.add("is-invalid");
+								return;
+							}
+							document.getElementById("your-secretkey").oninput();
+							document.querySelector("#heading-4 > button").disabled = false;
+							document.querySelector("#heading-4 > button").click();
+							document.querySelector("#heading-4 > button").disabled = true;
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="heading-4">
+				<button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-4" disabled>
+					Enter Their Public Key
+				</button>
+			</h2>
+			<div id="collapse-4" class="accordion-collapse collapse" data-bs-parent="#everything">
+				<div class="accordion-body">
+					It should be 64 hexadecimal characters long.
+					<div class="input-group mb-3 mt-3">
+						<span class="input-group-text">Public Key</span>
+						<input id="their-publickey" type="text" class="form-control">
+					</div>
+					<button id="their-next" class="btn btn-outline-primary">Next</button>
+					<script>
+						document.getElementById("their-publickey").oninput = function(){
+							this.classList.remove("is-invalid");
+						}
+						document.getElementById("their-next").onclick = ()=>{
+							window.their = document.getElementById("their-publickey").value;
+							if(!window.their.match(/^[0-9A-Fa-f]{64}$/)){
+								document.getElementById("their-publickey").classList.add("is-invalid");
+								return;
+							}
+							document.getElementById("their-publickey").oninput();
+							document.querySelector("#heading-5 > button").disabled = false;
+							document.querySelector("#heading-5 > button").click();
+							document.querySelector("#heading-5 > button").disabled = true;
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+		<div class="accordion-item">
+			<h2 class="accordion-header" id="heading-5">
+				<button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-5" disabled>
+					Exchange Messages
+				</button>
+			</h2>
+			<div id="collapse-5" class="accordion-collapse collapse" data-bs-parent="#everything">
+				<div class="accordion-body">
+					Are you sending a message or decrypting a message that you received?
+					<div id="exchange-type" class="btn-group mt-3">
+						<input id="sending" type="radio" class="btn-check">
+						<label class="btn btn-outline-primary" for="sending">Sending a message</label>
+						<input id="decrypting" type="radio" class="btn-check">
+						<label class="btn btn-outline-primary" for="decrypting">Decrypting a message</label>
+					</div>
+					<button id="exchange-toggle" data-bs-toggle="collapse" data-bs-target="#exchange"></button>
+					<div id="exchange" class="collapse">
+						<span id="exchange-label-1">Enter your message:</span>
+						<textarea id="din" class="form-control mt-3 mb-3" rows="6"></textarea>
+						<span id="exchange-label-2">Encrypted output:</span>
+						<div id="dout-group" class="input-group mt-3">
+							<textarea id="dout" class="form-control" rows="6" readonly></textarea>
+							<button id="dout-copy" class="btn btn-outline-secondary">
+								<i class="fa-regular fa-clipboard fa-fw"></i>
+							</button>
+						</div>
+						<div class="invalid-feedback">
+							The encrypted message is invalid and can't be decrypted.
+						</div>
+						<span id="encrypt-note">
+							Remember to share your <strong>Public Key</strong> with your recipient!
+						</span>
+					</div>
+					<script>
+						const toUint8Array = hex=>{
+							return Uint8Array.from(hex.match(/.{1,2}/g).map(b=>parseInt(b,16)));
+						};
+						document.getElementById("sending").oninput = ()=>{
+							document.getElementById("exchange-type").classList.add("mb-3");
+							document.getElementById("sending").disabled = true;
+							document.getElementById("decrypting").disabled = true;
+							if(document.getElementById("sending").checked){
+								window.mode = "encrypt";
+								document.getElementById("dout-group").classList.add("mb-3");
+								document.getElementById("encrypt-note").style.display = "block";
+							}else{
+								window.mode = "decrypt";
+								document.getElementById("exchange-label-1").innerHTML = "Enter encrypted message:";
+								document.getElementById("exchange-label-2").innerHTML = "Decrypted output:";
+							}
+							document.getElementById("exchange-toggle").click();
+						};
+						document.getElementById("decrypting").oninput = document.getElementById("sending").oninput;
+						document.getElementById("din").oninput = ()=>{
+							var publicKey = toUint8Array(their);
+							var secretKey = toUint8Array(your);
+							if(mode=="encrypt"){
+								var din = new TextEncoder().encode(document.getElementById("din").value);
+								var nonce = new Uint8Array(24);
+								crypto.getRandomValues(nonce);
+								var ciphertext = nacl.box(din,nonce,publicKey,secretKey);
+								var final = new Uint8Array([...nonce,...ciphertext]);
+								final = btoa(String.fromCharCode.apply(null,final));
+								document.getElementById("dout").value = final;
+							}else{
+								try{
+									var din = document.getElementById("din").value;
+									din = Uint8Array.from(atob(din),c=>c.charCodeAt(0));
+									var nonce = din.slice(0,24);
+									var ciphertext = din.slice(24,din.length);
+									var plaintext = nacl.box.open(ciphertext,nonce,publicKey,secretKey);
+									document.getElementById("dout").value = new TextDecoder().decode(plaintext);
+									document.getElementById("dout").classList.remove("is-invalid");
+								}catch(e){
+									document.getElementById("dout").value = "";
+									document.getElementById("dout").classList.add("is-invalid");
+								}
+							}
+						};
+						document.getElementById("dout-copy").onclick = ()=>{
+							navigator.clipboard.writeText(document.getElementById("dout").value);
+							document.getElementById("dout-copy").disabled = true;
+							document.querySelector("#dout-copy i").className = "fa-solid fa-check fa-fw";
+							setTimeout(()=>{
+								document.getElementById("dout-copy").disabled = false;
+								document.querySelector("#dout-copy i").className = "fa-regular fa-clipboard fa-fw";
+							},1000);
+						};
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
