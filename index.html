@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
 	<title>Paircrypt</title>
-	<meta charset="UTF-8">
 	<meta name="robots" content="noindex">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
@@ -22,33 +20,21 @@
 		}
 		body{
 			margin:0;
-			width:100vw;
-			height:100vh;
-			overflow:hidden;
+			width:calc(100vw - (100vw - 100%));
+			overflow-x:hidden;
 			display:flex;
-			align-items:center;
 			justify-content:center;
+		}
+		#everything{
+			width:min(900px,100%);
+			padding:30px;
+			box-sizing:border-box;
 		}
 		textarea{
 			resize:none;
 		}
-		#everything{
-			width:min(840px,90%);
-		}
 		#exchange-toggle,#encrypt-note{
 			display:none;
-		}
-		@media screen and (max-width:600px){
-			body{
-				display:block;
-				overflow-x:hidden;
-				overflow-y:scroll;
-			}
-			#everything{
-				padding:32px;
-				box-sizing:border-box;
-				width:100%;
-			}
 		}
 	</style>
 </head>
@@ -62,7 +48,7 @@
 			</h2>
 			<div id="collapse-1" class="accordion-collapse collapse show" data-bs-parent="#everything">
 				<div class="accordion-body">
-					Welcome to Paircrypt! Have you used this tool before?
+					Welcome to Paircrypt. Have you used this tool before?
 					<div class="mt-3">
 						<button id="used-no" class="btn btn-outline-primary">No</button>
 						<button id="used-yes" class="btn btn-outline-primary">Yes</button>
@@ -165,7 +151,7 @@
 					<script>
 						document.getElementById("your-secretkey").oninput = function(){
 							this.classList.remove("is-invalid");
-						}
+						};
 						document.getElementById("your-next").onclick = ()=>{
 							window.your = document.getElementById("your-secretkey").value;
 							if(!window.your.match(/^[0-9A-Fa-f]{64}$/)){
@@ -198,7 +184,7 @@
 					<script>
 						document.getElementById("their-publickey").oninput = function(){
 							this.classList.remove("is-invalid");
-						}
+						};
 						document.getElementById("their-next").onclick = ()=>{
 							window.their = document.getElementById("their-publickey").value;
 							if(!window.their.match(/^[0-9A-Fa-f]{64}$/)){
@@ -241,10 +227,10 @@
 							</button>
 						</div>
 						<div class="invalid-feedback">
-							The encrypted message is invalid and can't be decrypted.
+							The ciphertext is invalid and can't be decrypted.
 						</div>
 						<span id="encrypt-note">
-							Remember to share your <strong>Public Key</strong> with your recipient!
+							Remember to share your <strong>Public Key</strong> with your recipient.
 						</span>
 					</div>
 					<script>
@@ -268,12 +254,12 @@
 						};
 						document.getElementById("decrypting").oninput = document.getElementById("sending").oninput;
 						document.getElementById("din").oninput = ()=>{
-							var publicKey = toUint8Array(their);
-							var secretKey = toUint8Array(your);
-							if(mode=="encrypt"){
+							var publicKey = toUint8Array(window.their);
+							var secretKey = toUint8Array(window.your);
+							if(window.mode=="encrypt"){
 								var din = new TextEncoder().encode(document.getElementById("din").value);
 								var nonce = new Uint8Array(24);
-								crypto.getRandomValues(nonce);
+								window.crypto.getRandomValues(nonce);
 								var ciphertext = nacl.box(din,nonce,publicKey,secretKey);
 								var final = new Uint8Array([...nonce,...ciphertext]);
 								final = btoa(String.fromCharCode.apply(null,final));
