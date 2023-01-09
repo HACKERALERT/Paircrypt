@@ -220,14 +220,14 @@
 						<span id="exchange-label-1">Enter your message:</span>
 						<textarea id="din" class="form-control mt-3 mb-3" rows="6"></textarea>
 						<span id="exchange-label-2">Encrypted output:</span>
-						<div id="dout-group" class="input-group mt-3">
+						<div id="dout-group" class="input-group has-validation mt-3">
 							<textarea id="dout" class="form-control" rows="6" readonly></textarea>
 							<button id="dout-copy" class="btn btn-outline-secondary">
 								<i class="fa-regular fa-clipboard fa-fw"></i>
 							</button>
-						</div>
-						<div class="invalid-feedback">
-							The ciphertext is invalid and can't be decrypted.
+							<div id="dout-invalid" class="invalid-feedback">
+								The ciphertext is invalid and can't be decrypted.
+							</div>
 						</div>
 						<span id="encrypt-note">
 							Remember to share your <strong>Public Key</strong> with your recipient.
